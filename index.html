@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI设计作品集</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #1C1C1C;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+        
+        .portfolio {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            gap: 0;
+        }
+        
+        .portfolio-item {
+            width: 100%;
+        }
+        
+        .portfolio-item img {
+            width: 100%;
+            display: block;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #1C1C1C;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(51, 106, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #336AFF;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #FFFFFF;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+        
+        .error-text {
+            color: #565D66;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .retry-btn {
+            color: #336AFF;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                width: 65%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="error-message" id="errorMessage">
+        <div class="error-text">加载失败</div>
+        <div class="retry-btn" id="retryBtn">重试</div>
+    </div>
+    
+    <div class="container">
+        <div class="portfolio" id="portfolio">
+            <!-- 图片将在这里显示 -->
+        </div>
+    </div>
+
+    <script>
+        // 修改这里的图片路径为你的实际PNG图片文件名
+        const imagePaths = [
+            'images/work1.png',
+            'images/work2.png',
+            'images/work3.png',
+            'images/work4.png',
+            'images/work5.png',
+            'images/work6.png',
+            'images/work7.png',
+            'images/work8.png',
+            'images/work9.png',
+            'images/work10.png',
+            'images/work11.png',
+            'images/work12.png',
+            'images/work13.png',
+            'images/work14.png',
+            'images/work15.png',
+            'images/work16.png',
+            'images/work17.png',
+            'images/work18.png',
+            'images/work19.png',
+            'images/work20.png'
+        ];
+        
+        const loadingElement = document.getElementById('loading');
+        const errorMessageElement = document.getElementById('errorMessage');
+        const portfolioElement = document.getElementById('portfolio');
+        const retryBtn = document.getElementById('retryBtn');
+        
+        function loadImages() {
+            let loadedCount = 0;
+            const totalImages = imagePaths.length;
+            
+            if (totalImages === 0) {
+                showError();
+                return;
+            }
+            
+            imagePaths.forEach(path => {
+                const img = new Image();
+                img.onload = () => {
+                    loadedCount++;
+                    if (loadedCount === totalImages) {
+                        setTimeout(() => {
+                            loadingElement.style.display = 'none';
+                            addImagesToPortfolio();
+                        }, 500);
+                    }
+                };
+                
+                img.onerror = () => {
+                    showError();
+                };
+                
+                img.src = path;
+            });
+        }
+        
+        function showError() {
+            loadingElement.style.display = 'none';
+            errorMessageElement.style.display = 'flex';
+        }
+        
+        function addImagesToPortfolio() {
+            imagePaths.forEach(path => {
+                const portfolioItem = document.createElement('div');
+                portfolioItem.className = 'portfolio-item';
+                
+                const img = document.createElement('img');
+                img.src = path;
+                img.alt = 'UI设计作品';
+                
+                portfolioItem.appendChild(img);
+                portfolioElement.appendChild(portfolioItem);
+            });
+        }
+        
+        retryBtn.addEventListener('click', () => {
+            errorMessageElement.style.display = 'none';
+            loadingElement.style.display = 'flex';
+            portfolioElement.innerHTML = '';
+            loadImages();
+        });
+        
+        window.addEventListener('DOMContentLoaded', loadImages);
+    </script>
+</body>
+</html>
