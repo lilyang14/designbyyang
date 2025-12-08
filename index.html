@@ -49,10 +49,33 @@
       transition: opacity 0.25s ease;
     }
 
+    /* 骨架屏样式 */
+    .skeleton {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(90deg, #2d2d2d 25%, #3a3a3a 50%, #2d2d2d 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
     @media (max-width: 900px) {
       .gallery {
         width: 100%;
         max-width: 100%;
+      }
+      .skeleton {
+        height: 200px;
       }
     }
 
@@ -74,7 +97,7 @@
 
     #network-error p {
       margin: 0;
-      font-size: 16px;
+      font-size: 20px;
     }
 
     #network-error button {
@@ -92,7 +115,10 @@
 
 <body>
   <main class="page">
-    <section id="gallery" class="gallery" aria-live="polite"></section>
+    <section id="gallery" class="gallery" aria-live="polite">
+      <!-- 骨架屏占位符将在加载时显示 -->
+      <div id="skeleton-container"></div>
+    </section>
   </main>
 
   <div id="network-error">
@@ -105,6 +131,7 @@
     window.addEventListener("load", () => window.scrollTo(0, 0));
 
     const gallery = document.getElementById("gallery");
+    const skeletonContainer = document.getElementById("skeleton-container");
     const errorBox = document.getElementById("network-error");
     const reloadBtn = document.getElementById("reload-btn");
     reloadBtn.onclick = () => location.reload();
@@ -116,8 +143,25 @@
 
     let misses = 0;
 
+    // 创建骨架屏
+    function createSkeletons(count) {
+      skeletonContainer.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const skeleton = document.createElement('div');
+        skeleton.className = 'skeleton';
+        skeletonContainer.appendChild(skeleton);
+      }
+    }
+
+    // 初始创建10个骨架屏
+    createSkeletons(10);
+
     function loadImage(i) {
-      if (i > maxIndex || misses >= stopAfterMiss) return;
+      if (i > maxIndex || misses >= stopAfterMiss) {
+        // 加载完成后移除骨架屏
+        skeletonContainer.style.display = 'none';
+        return;
+      }
 
       let extIndex = 0;
 
@@ -136,6 +180,15 @@
           misses = 0;
           img.style.opacity = "1";
           gallery.appendChild(img);
+          
+          // 当加载到第i张图片时，移除对应的骨架屏
+          if (i <= 10) {
+            const skeletons = skeletonContainer.querySelectorAll('.skeleton');
+            if (skeletons.length > 0) {
+              skeletons[0].remove();
+            }
+          }
+          
           loadImage(i + 1);
         };
 
